@@ -13,7 +13,7 @@ describe PagesController do
 
     it 'should have the right title' do
       get :home
-      expect(response.body).to match /#{@base_title} \| Home/
+      expect(response.body).to match /#{@base_title} | Home/
     end
   end
 
@@ -25,7 +25,7 @@ describe PagesController do
 
     it 'should have the right title' do
       get :contact
-      expect(response.body).to match /#{@base_title} \| Contact/
+      expect(response.body).to match /#{@base_title} | Contact/
     end
   end
 
@@ -37,7 +37,7 @@ describe PagesController do
 
     it 'should have the right title' do
       get :about
-      expect(response.body).to match /#{@base_title} \| About/
+      expect(response.body).to match /#{@base_title} | About/
     end
   end
 
@@ -49,7 +49,7 @@ describe PagesController do
 
     it 'should have the right title' do
       get :help
-      expect(response.body).to match /#{@base_title} \| Help/
+      expect(response.body).to match /#{@base_title} | Help/
     end
   end
 end
