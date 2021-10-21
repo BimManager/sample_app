@@ -58,3 +58,5 @@ end
 
 gem 'bootstrap-sass'
 gem 'jquery-rails'
+
+gem 'capybara'
