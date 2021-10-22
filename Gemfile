@@ -49,6 +49,8 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 group :development do
   gem 'rspec-rails'
+  gem 'capybara'
+  gem 'annotate'
 end
 
 group :test do
@@ -59,4 +61,4 @@ end
 gem 'bootstrap-sass'
 gem 'jquery-rails'
 
-gem 'capybara'
+
