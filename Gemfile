@@ -56,9 +56,12 @@ end
 group :test do
   gem 'rspec'
   gem 'webrat'
+  gem 'factory_bot_rails'
+  gem 'rails-controller-testing'
 end
 
 gem 'bootstrap-sass'
 gem 'jquery-rails'
 
+gem 'gravatar_image_tag'
 
