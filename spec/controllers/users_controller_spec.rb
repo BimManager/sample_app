@@ -115,6 +115,11 @@ describe UsersController do
         post :create, :params => { :user => @attr }
         expect(flash[:success]).to match(/welcome to the sample app/i)
       end
+
+      it 'should sign the user in' do
+        post :create, :params => { :user => @attr }
+        expect(controller.signed_in?).to eq(true)
+      end
     end
   end
 end

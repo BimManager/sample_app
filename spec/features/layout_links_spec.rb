@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'factory_bot'
 
 RSpec.feature 'LayoutLinks', type: :feature do
   scenario "User clicks the 'About' link" do
@@ -28,6 +29,32 @@ RSpec.feature 'LayoutLinks', type: :feature do
   scenario "User clicks the 'Sign up now!' link" do
     visit root_path
     click_link 'Sign up now!'
-    expect(page).to have_text(/Users#new/)
+    expect(page).to have_text(/Sign up/)
+  end
+
+  scenario 'when the user is not signed in' do
+    @user = FactoryBot.create(:user)
+    visit signin_path
+    expect(page).to have_css('a', text: 'Sign in')
+  end
+
+  feature 'when the user is signed in' do
+    background(:each) do
+      @user = FactoryBot.create(:user)
+      visit signin_path
+      fill_in 'Email', :with => @user.email
+      fill_in 'Password', :with => @user.password
+      click_button
+    end
+    
+    scenario 'there should be a signout link' do
+      visit root_path
+      expect(page).to have_css('a', text: 'Sign out')
+    end
+
+    scenario 'there should be a profile link' do
+      visit root_path
+      expect(page).to have_css('a', text: 'Profile')
+    end
   end
 end
