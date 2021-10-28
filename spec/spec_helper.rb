@@ -96,4 +96,16 @@ RSpec.configure do |config|
   def test_sign_in(user)
     controller.sign_in(user)
   end
+
+  def integration_sign_in(user)
+    visit sigin_path
+    fill_in 'Email', :width => user.email
+    fill_in 'Password', :with => user.password
+    click_button
+  end
+
+  def empty_attr
+    { :email => '', :name => '', :password => '',
+      :password_confirmation => '' }
+  end
 end

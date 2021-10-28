@@ -51,17 +51,19 @@ group :development do
   gem 'rspec-rails'
   gem 'capybara'
   gem 'annotate'
+  gem 'faker'
 end
 
 group :test do
   gem 'rspec'
   gem 'webrat'
   gem 'factory_bot_rails'
-  gem 'rails-controller-testing'
+  gem 'rails-controller-testing'  
 end
 
 gem 'bootstrap-sass'
 gem 'jquery-rails'
 
 gem 'gravatar_image_tag'
+gem 'will_paginate'
 

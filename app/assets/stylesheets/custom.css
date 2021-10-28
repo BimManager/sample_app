@@ -3,7 +3,7 @@
 }
 
 body {
-    background: #cff
+    background: #adf
 }
 
 header {
@@ -181,4 +181,12 @@ div.flash.error {
     font-size: 12px;
     background-color: #c00;
     color: #fff;
+}
+
+ul.users {
+    margin-top: 1em;
+}
+
+.users li {
+    list-style: none;
 }

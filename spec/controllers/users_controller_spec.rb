@@ -67,6 +67,80 @@ describe UsersController do
     end
   end
 
+  describe 'GET edit' do
+    before(:each) do
+      @user = FactoryBot.create(:user)
+      test_sign_in(@user)
+    end
+
+    it 'should be successful' do
+      get :edit, :params => { :id => @user }
+      expect(response).to have_http_status(200)
+    end
+
+    it 'should have the right title' do
+      get :edit, :params => { :id => @user }
+      expect(response.body).to have_title('Ruby on Rails Tutorial Sample ' \
+                                            'App | Edit user')
+    end
+
+    it 'should have a linkg to change the Gravatar' do
+      get :edit, :params => { :id => @user }
+      gravatar_url = 'https://gravatar.com/emails'
+      expect(response.body).to have_selector(:css, "a[href=\"#{gravatar_url}\"]")
+    end
+  end
+
+  describe 'GET index' do
+    describe 'for non-signed-in users' do
+      it 'should deny access' do
+        get :index
+        expect(response).to redirect_to(signin_path)
+        expect(flash[:notice]).to match(/sign in/i)
+      end
+    end
+
+    describe 'for signed-in users' do
+      before(:each) do
+        @user = FactoryBot.create(:user)
+        test_sign_in(@user)
+        second = FactoryBot.create(:user, :email => 'another@example.com')
+        third = FactoryBot.create(:user, :email => 'another@example.net')
+        @users = [@user, second, third]
+        30.times do
+          @users << FactoryBot.create(:user, :email => FactoryBot.generate(:email))
+        end
+      end
+
+      it 'should be successful' do
+        get :index
+        expect(response).to have_http_status(200)
+      end
+
+      it 'should have the right title' do
+        get :index
+        expect(response.body).to have_title('Ruby on Rails Tutorial Sample ' \
+                                            'App | All users')
+      end
+
+      it 'should have an element for each user' do
+        get :index
+        @users[0..2].each do |user|
+          expect(response.body).to have_css('li', text: user.name)
+        end
+      end
+
+      it 'should paginate users' do
+        get :index
+        expect(response.body).to have_selector('div.pagination')
+        expect(response.body).to have_selector(
+                                   'span.disabled', text: 'Previous')
+        expect(response.body).to have_selector(:css,
+                                                'a[href="/users?page=2"]')
+      end
+    end
+  end
+
   describe "POST 'create'" do
     describe "failure" do
       before(:each) do
@@ -122,4 +196,92 @@ describe UsersController do
       end
     end
   end
+
+  describe 'PUT update' do
+    before(:each) do
+      @user = FactoryBot.create(:user)
+      test_sign_in(@user)
+    end
+    
+    describe 'failure' do
+      before(:each) do
+        @attr = empty_attr        
+      end
+
+      it 'should render the edit page' do
+        put :update, :params => { :id => @user, :user => @attr }
+        expect(response).to render_template('edit')
+      end
+
+      it 'should have the right title' do
+        put :update, :params => { :id => @user, :user => @attr }
+        expect(response.body).to have_title('Ruby on Rails Tutorial Sample ' \
+                                            'App | Edit user')
+      end
+    end
+
+    describe 'success' do
+      before(:each) do
+        @attr = { :name => 'New Name', :email => 'user@example.com',
+                  :password => 'barbaz',
+                  :password_confirmation => 'barbaz' }
+      end
+
+      it 'should change the attributes of the user' do
+        put :update, :params => { :id => @user, :user => @attr }
+        @user.reload
+        expect(@user.name).to eq(@attr[:name])
+        expect(@user.email).to eq(@attr[:email])
+      end
+
+      it 'should redirect to the user show page' do
+        put :update, :params => { :id => @user, :user => @attr }
+        expect(response).to redirect_to(user_path(@user))
+      end
+
+      it 'should have a flash message' do
+        put :update, :params => { :id => @user, :user => @attr }
+        expect(flash[:success]).to match(/updated/)
+      end
+      
+    end
+  end
+
+  describe 'authentication of edit/update pages' do
+    before(:each) do
+      @user = FactoryBot.create(:user)
+    end
+
+    describe 'for non-signed-in users' do
+      it 'should deny access to edit' do
+        get :edit, :params => { :id => @user }
+        expect(response).to redirect_to(signin_path)
+      end
+
+      it 'should deny access to update' do
+        get :update, :params => { :id => @user, :user => {} }
+        expect(response).to redirect_to(signin_path)
+      end
+    end
+
+    describe 'for signed-in users' do
+      before(:each) do
+        wrong_user = FactoryBot.create(:user, :email => 'user@example.net')
+        test_sign_in(wrong_user)
+#        wrong_user.email = 'user@example.net'
+      end
+
+      it 'should require matching users for edit' do
+        get :edit, :params => { :id => @user }
+        expect(response).to redirect_to(root_path)
+      end
+
+      it 'should require matching user for update' do
+        get :update, :params => { :id => @user, :user => {} }
+        expect(response).to redirect_to(root_path)
+      end
+      
+    end
+    
+  end  
 end
