@@ -247,6 +247,40 @@ describe UsersController do
     end
   end
 
+  describe 'DELETE destroy' do
+    before(:each) do
+      @user = FactoryBot.create(:user)
+    end
+
+    describe 'as a non-signed-in user' do
+      it 'should deny access' do
+        delete :destroy, :params => { :id => @user }
+        expect(response).to redirect_to(signin_path)
+      end
+    end
+
+    describe 'as a non-admin user' do
+      it 'should protect the page' do
+        test_sign_in(@user)
+        delete :destroy, :params => { :id => @user }
+        expect(response).to redirect_to(root_path)
+      end
+    end
+
+    describe 'as an admin user' do
+      before(:each) do
+        admin = FactoryBot.create(:user, :email => 'admin@example.com',
+                                  :admin => true)
+        test_sign_in(admin)
+      end
+
+      it 'should destroy the user' do
+        expect { delete :destroy, :params => { :id => @user } }.to \
+        change(User, :count).by(-1)
+      end
+    end
+  end
+
   describe 'authentication of edit/update pages' do
     before(:each) do
       @user = FactoryBot.create(:user)

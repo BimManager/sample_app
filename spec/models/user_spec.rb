@@ -112,4 +112,24 @@ RSpec.describe User, type: :model do
       end
     end
   end
+
+  describe 'admin attribute' do
+    before(:each) do
+      @user = User.create!(@attr)
+    end
+
+    it 'should respons to admin' do
+      expect(@user).to respond_to(:admin)
+    end
+
+    it 'should not be an admin by default' do
+      expect(@user.admin?).to eq(false)
+    end
+
+    it 'should be convertible to an admin' do
+      @user.toggle!(:admin)
+      expect(@user.admin?).to eq(true)
+    end
+    
+  end
 end
