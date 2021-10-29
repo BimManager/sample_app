@@ -65,6 +65,16 @@ describe UsersController do
       #      expect(response.body).to match(/<img.+class="gravatar"/)
       expect(response.body).to have_selector 'h1>img', :class => 'gravatar'
     end
+
+    it "should show the user's microposts" do
+      mp1 = FactoryBot.create(:micropost, :user => @user,
+                              :content => 'Foo bar')
+      mp2 = FactoryBot.create(:micropost, :user => @user,
+                              :content => 'Baz quux')
+      get :show, :params => { :id => @user }
+      expect(response.body).to have_selector('span.content', text: mp1.content)
+      expect(response.body).to have_selector('span.content', text: mp2.content)
+    end
   end
 
   describe 'GET edit' do

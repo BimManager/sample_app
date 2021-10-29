@@ -35,6 +35,10 @@ class User < ApplicationRecord
     self.encrypted_password.eql? encrypt(submitted_password)
   end
 
+  def feed
+    Micropost.where('user_id = ?', id)
+  end
+
   private
 
   def encrypt_password

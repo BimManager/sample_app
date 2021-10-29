@@ -157,5 +157,23 @@ RSpec.describe User, type: :model do
         expect(Micropost.find_by_id(mp.id)).to eq(nil)
       end
     end
+
+    describe 'status feed' do
+      it 'should have a feed' do
+        expect(@user).to respond_to(:feed)
+      end
+
+      it "should include the user's microposts" do
+        expect(@user.feed.include?(@mp1)).to eq(true)
+        expect(@user.feed.include?(@mp2)).to eq(true)
+      end
+
+      it "should not include a different user's microposts" do
+        mp3 = FactoryBot.create(:micropost,
+                                :user => FactoryBot.create(
+                                  :user, :email => FactoryBot.generate(:email)))
+        expect(@user.feed.include?(mp3)).to eq(false)
+      end
+    end
   end
 end
