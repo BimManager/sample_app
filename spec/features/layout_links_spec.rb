@@ -56,5 +56,21 @@ RSpec.feature 'LayoutLinks', type: :feature do
       visit root_path
       expect(page).to have_css('a', text: 'Profile')
     end
+
+    scenario 'they cannot see the delete link unless an admin' do
+      visit users_path
+      expect(page).not_to have_text('delete')
+    end
+
+    scenario 'they should be able to see the delete link if an admin' do
+      admin = FactoryBot.create(:user, :email => 'admin@example.com',
+                                :admin => true)
+      visit signin_path
+      fill_in 'Email', :with => admin.email
+      fill_in 'Password', :with => admin.password
+      click_button
+      visit users_path
+      expect(page).to have_text('delete')
+    end
   end
 end

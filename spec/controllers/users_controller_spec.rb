@@ -269,14 +269,19 @@ describe UsersController do
 
     describe 'as an admin user' do
       before(:each) do
-        admin = FactoryBot.create(:user, :email => 'admin@example.com',
+        @admin = FactoryBot.create(:user, :email => 'admin@example.com',
                                   :admin => true)
-        test_sign_in(admin)
+        test_sign_in(@admin)
       end
 
       it 'should destroy the user' do
         expect { delete :destroy, :params => { :id => @user } }.to \
         change(User, :count).by(-1)
+      end
+
+      it 'should not be capable of destroying themselves' do
+        expect { delete :destroy, :params => { :id => @admin } }.not_to \
+        change(User, :count)
       end
     end
   end
@@ -316,6 +321,42 @@ describe UsersController do
       end
       
     end
+  end
+
+  describe 'access to new/edit pages' do
+    describe 'for non-signed-in users' do
+      before(:each) do
+        @user = FactoryBot.create(:user)
+      end
+
+      it 'should be able to access the new page' do
+        get :new, :params => { :id => @user }
+        expect(response).to have_http_status(200)
+        expect(response.body).to match(/sign up/i)
+      end
+
+      it 'should be able to access the edit page' do
+        get :create, :params => { :id => @user }
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    describe 'for signed-in users' do
+      before(:each) do
+        @user = FactoryBot.create(:user)
+        test_sign_in(@user)
+      end
+
+      it 'should not be able to access the new page' do
+        get :new, :params => { :id => @user }
+        expect(response).to redirect_to(root_path)
+      end
+
+      it 'should not be able to access the edit page' do
+        get :create, :params => { :id => @user }
+        expect(response).to redirect_to(root_path)
+      end
+    end
     
-  end  
+  end
 end
