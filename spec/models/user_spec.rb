@@ -129,7 +129,33 @@ RSpec.describe User, type: :model do
     it 'should be convertible to an admin' do
       @user.toggle!(:admin)
       expect(@user.admin?).to eq(true)
+    end    
+  end
+
+  describe 'micropost associations' do
+    before(:each) do
+      @user = User.create(@attr)
+      @mp1 = FactoryBot.create(:micropost,
+                               :user => @user,
+                               :created_at => 1.day.ago)
+      @mp2 = FactoryBot.create(:micropost,
+                               :user => @user,
+                               :created_at => 1.hour.ago)
     end
-    
+
+    it 'should have a microposts attribute' do
+      expect(@user).to respond_to(:microposts)
+    end
+
+    it 'should have the right microposts in the right order' do
+      expect(@user.microposts).to eq([@mp2, @mp1])
+    end
+
+    it "should remove the user's microposts when the user gets deleted" do
+      @user.destroy
+      [@mp1, @mp2].each do |mp|
+        expect(Micropost.find_by_id(mp.id)).to eq(nil)
+      end
+    end
   end
 end

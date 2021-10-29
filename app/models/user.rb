@@ -4,6 +4,8 @@ class User < ApplicationRecord
   #  attr_accessor :name, :email
   attr_accessor :password
 
+  has_many :microposts, :dependent => :destroy
+
   email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i;
   
   validates :name,
