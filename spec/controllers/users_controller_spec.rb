@@ -367,6 +367,45 @@ describe UsersController do
         expect(response).to redirect_to(root_path)
       end
     end
-    
+  end
+
+  describe 'follow pages' do
+    describe 'when not signed-in' do
+      it 'should protect following' do
+        get :following, :params => { :id => 1 }
+        expect(response).to redirect_to(signin_path)
+      end
+
+      it 'should protect followers' do
+        get :followers, :params => { :id => 1 }
+        expect(response).to redirect_to(signin_path)
+      end
+    end
+
+    describe 'when signed-in' do
+      before(:each) do
+        @user = FactoryBot.create(:user)
+        test_sign_in(@user)
+        @other_user = FactoryBot.create(
+          :user, :email => FactoryBot.generate(:email))
+        @user.follow!(@other_user)
+      end
+
+      it 'should show user following' do
+        get :following, :params => { :id => @user }
+        expect(response).to render_template('show_follow')
+        expect(response.body).to have_selector(
+                                   "a[href=\"#{user_path(@other_user)}\"]",
+                                      text: "#{@other_user.name}")
+      end
+
+      it 'should show user followers' do
+        get :followers, :params => { :id => @other_user }
+        expect(response).to render_template('show_follow')
+        expect(response.body).to have_selector(
+                                   "a[href=\"#{user_path(@user)}\"]",
+                                   text: "#{@user.name}")
+      end
+    end
   end
 end

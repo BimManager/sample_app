@@ -85,4 +85,36 @@ describe MicropostsController do
       end
     end
   end
+
+  describe 'from_user_followed_by' do
+    before(:each) do
+      @user = FactoryBot.create(:user)
+      test_sign_in(@user)
+      @other_user = FactoryBot.create(
+        :user, :email => FactoryBot.generate(:email))
+      @third_user = FactoryBot.create(
+        :user, :email => FactoryBot.generate(:email))
+      @user_post = @user.microposts.create!(:content => 'foo')
+      @other_post = @other_user.microposts.create(:content => 'bar')
+      @third_post = @third_user.microposts.create(:content => 'baz')
+      @user.follow!(@other_user)
+    end
+
+    it 'should have a from_users_followed_by class method' do
+      expect(Micropost).to respond_to(:from_users_followed_by)
+    end
+
+    it "should include the followed user's microposts" do
+      expect(Micropost.from_users_followed_by(@user)).to include(@other_post)
+    end
+
+    it "should include the user's own microposts" do
+      expect(Micropost.from_users_followed_by(@user)).to include(@user_post)
+    end
+
+    it "should not include an unfollowed user's microposts" do
+      expect(Micropost.from_users_followed_by(@user)).not_to \
+                                                        include(@third_post)
+    end
+  end
 end

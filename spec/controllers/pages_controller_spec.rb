@@ -6,14 +6,39 @@ describe PagesController do
   before(:each) { @base_title = %q[<title>Ruby on Rails Tutorial] }
 
   describe "GET 'home'" do
-    it 'should have ok status' do
-      get :home
-      expect(response).to have_http_status(:ok)
+    describe 'when not signed-in' do
+      before(:each) { get :home }
+
+      it 'should have ok status' do
+        get :home
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'should have the right title' do
+        get :home
+        expect(response.body).to match /#{@base_title} | Home/
+      end
+
     end
 
-    it 'should have the right title' do
-      get :home
-      expect(response.body).to match /#{@base_title} | Home/
+    describe 'when signed-in' do
+      before(:each) do
+        @user = FactoryBot.create(:user)
+        test_sign_in(@user)
+        other_user = FactoryBot.create(
+          :user, :email => FactoryBot.generate(:email))
+        other_user.follow!(@user)
+      end
+
+      it 'should have the right follower/following counts' do
+        get :home
+        expect(response.body).to \
+        have_selector(:css, "a[href=\"#{following_user_path(@user)}\"]", \
+                      text: '0 following')
+        expect(response.body).to \
+        have_selector(:css, "a[href=\"#{followers_user_path(@user)}\"]", \
+                      text: '1 follower')
+      end
     end
   end
 

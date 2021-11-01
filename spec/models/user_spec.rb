@@ -174,6 +174,72 @@ RSpec.describe User, type: :model do
                                   :user, :email => FactoryBot.generate(:email)))
         expect(@user.feed.include?(mp3)).to eq(false)
       end
+      it 'should include the microposts of followed users' do
+        followed = FactoryBot.create(
+          :user, :email => FactoryBot.generate(:email))
+        mp3 = FactoryBot.create(:micropost, :user => followed)
+        @user.follow!(followed)
+        expect(@user.feed).to include(mp3)
+      end
+      
     end
+  end
+
+  describe 'relationships' do
+    before(:each) do
+      @user = User.create(@attr)
+      @followed = FactoryBot.create(:user)
+    end
+
+    it 'should have a relationships method' do
+      expect(@user).to respond_to(:relationships)
+    end
+
+    it 'should have a following method' do
+      expect(@user).to respond_to(:following)
+    end
+
+    it 'should have a following method' do
+      expect(@user).to respond_to(:following?)
+    end
+
+    it 'should have a follow! method' do
+      expect(@user).to respond_to(:follow!)
+    end
+
+    it 'should follow another user' do
+      @user.follow!(@followed)
+      expect(@user).to be_following(@followed)
+    end
+
+    it 'should include the followed user in the following array' do
+      @user.follow!(@followed)
+      expect(@user.following).to include(@followed)
+    end
+
+    it 'should have an unfollow! method' do
+      expect(@followed).to respond_to(:unfollow!)
+    end
+
+    it 'should unfollow a user' do
+      @user.follow!(@followed)
+      @user.unfollow!(@followed)
+      expect(@user.following).not_to include(@followed)
+    end
+
+    it 'should have a reverse_relationships method' do
+      expect(@user).to respond_to(:reverse_relationships)
+    end
+
+    it 'should have a followers method' do
+      expect(@user).to respond_to(:followers)
+    end
+
+    it 'should include the follower in the followers array' do
+      @user.follow!(@followed)
+      expect(@followed.followers).to include(@user)
+    end
+
+    
   end
 end
