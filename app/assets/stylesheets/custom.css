@@ -126,7 +126,7 @@ td.sidebar {
 
 .profile img.gravatar {
     border: 1px solid #999;
-    margin-bottom: -15px;
+    margin-bottom: 0;
 }
 
 div.field, div.action {
@@ -206,7 +206,7 @@ table.microposts tr {
 
 table.microposts tr td.gravatar {
     vertical-align: middle;
-    width: 50px;
+    width: 30px;
     padding: 0.2em;
 }
 
